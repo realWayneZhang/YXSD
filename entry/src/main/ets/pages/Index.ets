@@ -1,7 +1,10 @@
+import { add } from 'basic';
+
 @Entry
 @Component
 struct Index {
   @State message: string = 'Hello World';
+
 
   build() {
     RelativeContainer() {
