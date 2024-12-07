@@ -1,17 +1,18 @@
-import { AdvertModel } from 'basic'
+import { AdvertModel, UserPreferences } from 'basic'
 import { window } from '@kit.ArkUI'
+
 
 @Entry
 @Component
 struct StartPage {
-  @State obj: AdvertModel = {
-    adTime: 5,
-    showAd: false
-  }
+  @State obj: AdvertModel = {} as AdvertModel
   @State timer: number = -1
 
   // 页面开始加载的时候就会触发当前生命周期方法
   aboutToAppear(): void {
+    // 获取到本地存储的广告配置
+    const pref = new UserPreferences(getContext())
+    this.obj = pref.userAd;
     this.countdown()
   }
 
@@ -41,7 +42,11 @@ struct StartPage {
 
   build() {
     Stack({ alignContent: Alignment.TopEnd }) {
-      Image($r('app.media.ad')).objectFit(ImageFit.Cover).expandSafeArea()
+      if (typeof this.obj.adUrl === 'string') {
+      } else {
+        Image($r('app.media.ad')).objectFit(ImageFit.Cover).expandSafeArea()
+      }
+
       Text(this.obj.adTime === 0 ? '跳过' : `${this.obj.adTime}秒后跳过`)
         .height(30)
         .backgroundColor('#66999999')
@@ -51,13 +56,11 @@ struct StartPage {
           top: 5,
           bottom: 5
         })
-        .margin({ right: 15 , top: 40})
-
+        .margin({ right: 15, top: 40 })
         .borderRadius(13)
         .fontColor(Color.White)
-        .textAlign(TextAlign.Center).onClick(()=> {
-          this.closeAd()
-      })
+        .textAlign(TextAlign.Center)
+        .onClick(() => this.closeAd())
     }
   }
 }

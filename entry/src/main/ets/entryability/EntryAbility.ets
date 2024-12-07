@@ -1,6 +1,7 @@
 import { AbilityConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
 import { window } from '@kit.ArkUI';
+import { AdvertModel, defaultAd, UserPreferences } from 'basic';
 
 export default class EntryAbility extends UIAbility {
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
@@ -15,12 +16,25 @@ export default class EntryAbility extends UIAbility {
     // Main window is created, set main page for this ability
     hilog.info(0x0000, 'testTag', '%{public}s', 'Ability onWindowStageCreate');
 
-    // 创建子窗口
-    const window = await windowStage.createSubWindow('ad_window')
-    // 显示子窗口
-    await window.showWindow()
-    // 加载广告
-    window.setUIContent('pages/start/StartPage')
+    // 进入应用的时候，调用后台接口获取广告配置
+    const ad = await new Promise<AdvertModel>((resolve) => {
+      setTimeout(() => {
+        resolve(defaultAd)
+      }, 500)
+    })
+
+    // 将广告的配置存储到本地
+    const pref = new UserPreferences(this.context)
+    pref.setUserAd(ad)
+
+    if (ad.showAd) {
+      // 创建子窗口
+      const window = await windowStage.createSubWindow('ad_window')
+      // 显示子窗口
+      await window.showWindow()
+      // 加载广告
+      window.setUIContent('pages/start/StartPage')
+    }
 
     windowStage.loadContent('pages/Index', (err) => {
       if (err.code) {
