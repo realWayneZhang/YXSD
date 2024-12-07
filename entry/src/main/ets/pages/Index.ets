@@ -1,4 +1,4 @@
-import { add } from 'basic';
+
 
 @Entry
 @Component
