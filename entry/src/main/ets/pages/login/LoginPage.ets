@@ -1,19 +1,36 @@
+import { LoginApi } from '../../api/user';
 import { AccountForm } from '../../models'
 
 @Entry
 @Component
 struct LoginPage {
+  // 控制 loading
+  @State showLoading: boolean = false
   @State accoutForm: AccountForm = {
     account: '',
     password: ''
   }
 
   // 登录方法
-  submitLogin() {
-    AlertDialog.show({ message: JSON.stringify(this.accoutForm) })
+  async submitLogin()  {
+    // AlertDialog.show({ message: JSON.stringify(this.accoutForm) })
+
+    // 显示 loading
+    this.showLoading = true;
+    // 调用登录接口
+    try {
+      const res = await LoginApi(this.accoutForm)
+       AlertDialog.show({
+         message: JSON.stringify(res)
+       })
+    } catch (e) {
+      console.log('error', e);
+    } finally {
+      this.showLoading = false;
+    }
   }
 
-   validating(): boolean {
+  validating(): boolean {
     if (this.accoutForm.account && this.accoutForm.password) {
       return true
     }
@@ -54,10 +71,18 @@ struct LoginPage {
       // 账号输入框
       TextInput({ placeholder: '请输入账号', text: $$this.accoutForm.account }).loginInputStyle()
       // 密码输入框
-      TextInput({ placeholder: '请输入密码', text: $$this.accoutForm.password }).loginInputStyle()
+      TextInput({ placeholder: '请输入密码', text: $$this.accoutForm.password })
+        .loginInputStyle()
+        .type(InputType.Password)
       // 登录按钮
       Button({ type: ButtonType.Capsule }) {
-        Text('登录').fontColor(Color.White)
+        Row() {
+          if (this.showLoading) {
+            LoadingProgress().width(20).height(20).color($r('app.color.white')).margin({ right: 5 })
+          }
+          Text('登录').fontColor(Color.White)
+        }
+
       }
       .enabled(this.validating())
       .width('100%')

@@ -6,6 +6,5 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "libbasic.so": "file:./src/main/cpp/types/libbasic"
   }
 }
